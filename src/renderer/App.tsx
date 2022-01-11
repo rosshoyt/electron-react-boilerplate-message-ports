@@ -47,8 +47,9 @@ const Hello = () => {
         // Once we have the port, we can communicate directly with the main
         // process.
         port.onmessage = (e) => {
-          console.log('from main process:', e.data);
-          port.postMessage(e.data * 2);
+          const { data } = e;
+          console.log('from main process:', data);
+          port.postMessage(data.test * 2);
         };
       }
     };
