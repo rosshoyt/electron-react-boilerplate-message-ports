@@ -4,6 +4,8 @@ import icon from '../../assets/icon.svg';
 import './App.css';
 
 const Hello = () => {
+  const [audio, setAudio] = React.useState(new Audio());
+
   const makeStreamingRequest = (
     element: any,
     callback: (data: any) => void
@@ -48,10 +50,20 @@ const Hello = () => {
         // process.
         port.onmessage = (e) => {
           const { data } = e;
-          console.log('from main process:', data);
+          console.log(
+            'Recieved from main process:',
+            data.buff,
+            typeof data.buff
+          );
           port.postMessage(
             'Thanks for sending something over the port - Your BFF, Renderer'
           );
+          if (data.buff !== undefined) {
+            const blob = new Blob([data.buff], { type: 'audio/wav' });
+            const url = window.URL.createObjectURL(blob);
+            audio.src = url;
+            audio.play();
+          }
         };
       }
     };
@@ -71,7 +83,7 @@ const Hello = () => {
       <h1>electron-react-boilerplate</h1>
       <div className="Hello">
         <button type="button" onClick={buttonClicked}>
-          Choose a file
+          Choose a WAV audio file
         </button>
       </div>
     </div>

@@ -66,8 +66,7 @@ ipcMain.on('open-file-selector', async (_) => {
   const paths = await openFolderSelector();
   if (paths.length > 0) {
     const buffer = getBufferFromFile(paths[0]);
-    port2.postMessage(buffer);
-    // event.reply('select-folder-complete', paths[0]);
+    port2.postMessage({ buff: buffer });
   }
 });
 
@@ -117,6 +116,7 @@ const createWindow = async () => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
+      nodeIntegration: false,
     },
   });
 
