@@ -36,11 +36,26 @@ const Hello = () => {
     // };
   };
 
+  const playAudio = (buffer: any) => {
+    const blob = new Blob([buffer], { type: 'audio/wav' });
+    const url = window.URL.createObjectURL(blob);
+    audio.src = url;
+    audio.play();
+  };
+
   React.useEffect(() => {
     // // initiate test streaming request
     // makeStreamingRequest(42, (data: any) => {
     //   console.log('got response data:', data);
     // });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // Subscribe to ipc messages from main
+    window.electron.ipcRenderer.on('send-file', (data) => {
+      console.log('IPC got buffer', data.buff);
+      playAudio(data.buff);
+    });
+
     window.onmessage = (event) => {
       // event.source === window means the message is coming from the preload
       // script, as opposed to from an <iframe> or other source.
@@ -59,10 +74,7 @@ const Hello = () => {
             'Thanks for sending something over the port - Your BFF, Renderer'
           );
           if (data.buff !== undefined) {
-            const blob = new Blob([data.buff], { type: 'audio/wav' });
-            const url = window.URL.createObjectURL(blob);
-            audio.src = url;
-            audio.play();
+            playAudio(data.buff);
           }
         };
       }

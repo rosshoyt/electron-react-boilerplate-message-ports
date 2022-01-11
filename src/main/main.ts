@@ -61,12 +61,13 @@ ipcMain.on('give-me-a-stream', (event, msg) => {
   replyPort.close();
 });
 
-ipcMain.on('open-file-selector', async (_) => {
+ipcMain.on('open-file-selector', async (event) => {
   // TODO
   const paths = await openFolderSelector();
   if (paths.length > 0) {
     const buffer = getBufferFromFile(paths[0]);
-    port2.postMessage({ buff: buffer });
+    // port2.postMessage({ buff: buffer });
+    event.reply('send-file', { buff: buffer });
   }
 });
 

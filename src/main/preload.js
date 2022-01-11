@@ -27,7 +27,7 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.send('ipc-example', 'ping');
     },
     on(channel, func) {
-      const validChannels = ['ipc-example', 'main-world-port'];
+      const validChannels = ['ipc-example', 'send-file'];
       if (validChannels.includes(channel)) {
         // TODO was hoping to add the ipcRenderer code here:
         // if (channel === 'main-world-port') {
