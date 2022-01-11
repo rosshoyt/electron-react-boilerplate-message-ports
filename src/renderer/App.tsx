@@ -35,10 +35,23 @@ const Hello = () => {
   };
 
   React.useEffect(() => {
-    // initiate test streaming request
-    makeStreamingRequest(42, (data: any) => {
-      console.log('got response data:', data);
-    });
+    // // initiate test streaming request
+    // makeStreamingRequest(42, (data: any) => {
+    //   console.log('got response data:', data);
+    // });
+    window.onmessage = (event) => {
+      // event.source === window means the message is coming from the preload
+      // script, as opposed to from an <iframe> or other source.
+      if (event.source === window && event.data === 'main-world-port') {
+        const [port] = event.ports;
+        // Once we have the port, we can communicate directly with the main
+        // process.
+        port.onmessage = (e) => {
+          console.log('from main process:', e.data);
+          port.postMessage(e.data * 2);
+        };
+      }
+    };
   }, []);
 
   return (
