@@ -21,8 +21,11 @@ import {
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { getBufferFromFile, openFolderSelector, resolveHtmlPath } from './util';
 
+// We'll be sending one end of this channel to the main world of the
+// context-isolated page.
+const { port1, port2 } = new MessageChannelMain();
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -56,6 +59,16 @@ ipcMain.on('give-me-a-stream', (event, msg) => {
   // didn't explicitly close the port, it would eventually be garbage
   // collected, which would also trigger the 'close' event in the renderer.
   replyPort.close();
+});
+
+ipcMain.on('open-file-selector', async (_) => {
+  // TODO
+  const paths = await openFolderSelector();
+  if (paths.length > 0) {
+    const buffer = getBufferFromFile(paths[0]);
+    port2.postMessage(buffer);
+    // event.reply('select-folder-complete', paths[0]);
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -133,9 +146,7 @@ const createWindow = async () => {
     shell.openExternal(url);
   });
 
-  // We'll be sending one end of this channel to the main world of the
-  // context-isolated page.
-  const { port1, port2 } = new MessageChannelMain();
+
 
   // It's OK to send a message on the channel before the other end has
   // registered a listener. Messages will be queued until a listener is

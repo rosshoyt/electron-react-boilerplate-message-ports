@@ -11,12 +11,14 @@ ipcRenderer.on('main-world-port', async (event) => {
   await windowLoaded;
   // We use regular window.postMessage to transfer the port from the isolated
   // world to the main world.
-  console.log('in main-world-loaded');
   window.postMessage('main-world-port', '*', event.ports);
 });
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
+    send(message, payload) {
+      ipcRenderer.send(message, payload);
+    },
     postMessage(channel, element, port) {
       console.log('posting message', channel, element, port);
       ipcRenderer.postMessage(channel, element, port);
